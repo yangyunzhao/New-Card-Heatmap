@@ -55,30 +55,14 @@ def calculate_streaks(day_timestamps, today_ts):
 
 def fetch_review_data():
     """
-    Queries Anki's database to get a count of NEW CARDS learned per day,
-    respecting the user's "new day starts at" setting.
+    Queries Anki's database to get a count of ALL study events per day
+    (new cards and review cards), respecting the user's "new day starts at" setting.
     """
-    rollover_hour = mw.col.conf.get("rollover", 4)
-
-    offset_seconds = rollover_hour * 3600
     day_in_seconds = 86400
 
     query = """SELECT id 
-    FROM revlog AS r1
-    WHERE 
-        type = 0 
-        AND id IN (
-            SELECT
-                id
-            FROM
-                revlog AS r2
-            WHERE
-                r1.cid = r2.cid
-            ORDER BY
-                id
-            LIMIT
-                1)
-        """
+    FROM revlog
+    """
     all_timestamps_ms = mw.col.db.list(query)
 
     all_day_timestamps = [
